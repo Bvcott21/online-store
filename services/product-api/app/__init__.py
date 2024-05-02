@@ -11,8 +11,9 @@ def create_app():
     db.init_app(app)
     api = Api(app)
 
-    from .routes import ProductList
-    api.add_resource(ProductList, '/products')
-    # api.add_resource(ProductDetail, '/products/<string:product_id>')
+    from .routes import ProductList, ProductDetail, ProductSearchByName
     
+    api.add_resource(ProductList, '/products')
+    api.add_resource(ProductDetail, '/products/<string:product_id>')
+    api.add_resource(ProductSearchByName, '/products/find-by-name/<string:name>')    
     return app
