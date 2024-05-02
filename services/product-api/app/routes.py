@@ -31,3 +31,7 @@ class ProductList(Resource):
         db.session.commit()
         
         return {'product': product.serialize}, 201
+
+class ProductDetail(Resource):
+    def get_by_id(product_id):
+        return True
