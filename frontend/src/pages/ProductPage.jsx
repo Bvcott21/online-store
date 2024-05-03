@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Container, Row, Col } from "react-bootstrap";
 import ProductCard from "../components/ProductCard";
 import ReactPaginate from 'react-paginate';
+import { Link } from "react-router-dom";
 
 const ProductPage = () => {
     const [ products, setProducts ] = useState([]);
@@ -30,7 +31,6 @@ const ProductPage = () => {
             try {
                 const response = await axios.get('http://localhost:5000/products');
                 setProducts(response.data.products);
-                console.log(response.data.products);
             } catch(err) {
                 setError(err.message || 'An error occurred');
             } finally {
@@ -50,7 +50,9 @@ const ProductPage = () => {
           <Row xs={1} md={2} lg={5} className="g-4">
             {currentProducts.map((product) => (
               <Col key={product.id}>
+                <Link to={`/products/${product.id}`} style={{textDecoration: 'none'}}>
                 <ProductCard product={product} />
+                </Link>
               </Col>
             ))}
           </Row>
