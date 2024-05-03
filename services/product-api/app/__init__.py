@@ -22,7 +22,8 @@ def create_app():
     db.init_app(app)
     api = Api(app)
 
-    from .routes import ProductList, ProductDetail, ProductSearchByName, CategoryList, CategoryDetail
+    from .routes.product_controller import ProductList, ProductDetail, ProductSearchByName
+    from .routes.category_controller import CategoryList, CategoryDetail
     
     api.add_resource(ProductList, '/products')
     api.add_resource(ProductDetail, '/products/<string:product_id>')

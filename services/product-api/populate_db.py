@@ -1,6 +1,6 @@
 from app import create_app, db  # Ensure you're importing your Flask app and db correctly
-from app.models import Product, Category
-from uuid import uuid4
+from app.model.category import Category
+from app.model.product import Product
 
 products_data = [
     # Electronics
