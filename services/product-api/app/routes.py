@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
-from .models import Product, Category
+from .model.category import Category
+from .model.product import Product
 from . import db
 class ProductList(Resource):
     def get(self):
