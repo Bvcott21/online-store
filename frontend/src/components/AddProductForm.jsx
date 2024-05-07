@@ -20,6 +20,25 @@ const AddProductForm = () => {
             })
     }, [])
 
+    const postProduct = (product, setSubmitting, resetForm) => {
+        axios
+            .post("http://localhost:5000/products", product, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => {
+                console.log("Product added successfully:", response.data);
+                resetForm();
+            })
+            .catch(err => {
+                console.error("There was an error with product: ", err);
+            })
+            .finally(() => {
+                setSubmitting(false);
+            })
+    }
+    
     const productObjectMapper = (product) => {
         return {
             name: product.name,
@@ -58,22 +77,7 @@ const AddProductForm = () => {
                         }
                         onSubmit = {(values, {setSubmitting, resetForm}) => {
                             const product = productObjectMapper(values)
-                            axios
-                                .post("http://localhost:5000/products", product, {
-                                    headers: {
-                                        "Content-Type": "application/json"
-                                    }
-                                })
-                                .then(response => {
-                                    console.log("Product added successfully:", response.data);
-                                    resetForm();
-                                })
-                                .catch(err => {
-                                    console.error("There was an error with product: ", err);
-                                })
-                                .finally(() => {
-                                    setSubmitting(false);
-                                })
+                            postProduct(product, setSubmitting, resetForm);
                         }}
                     >
                 {({
