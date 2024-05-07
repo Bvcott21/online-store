@@ -20,7 +20,7 @@ class ProductList(Resource):
         args = parser.parse_args()
         
         category_ids = args['category_ids'].split(',') if args['category_ids'] else []
-        categories = Category.query.filter(Category.id.in_(category_ids))
+        categories = Category.query.filter(Category.id.in_(category_ids)).all()
         
         if args['price'] <= 0:
             return {'message': 'Price cannot be 0 or negative.'}, 400

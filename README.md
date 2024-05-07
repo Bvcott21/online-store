@@ -10,3 +10,15 @@ Ensure that the following ports are free
 - 5000 (Product API)
 - 5001 (Order API)
 - 8080 (User API)
+
+Backend frameworks/libraries used:
+- Flask
+- Flask-restful
+- Flask-sqlalchemy
+- Flask-cors
+
+Frontend frameworks/libraries used:
+- react-router-dom
+- formik
+- Yup
+- axios
