@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik } from 'formik';
 import { Form as RBForm, Container, Row, Col, Card } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 const AddProductForm = () => {
-
+    const navigate = useNavigate();
     const [ categories, setCategories ] = useState([]);
 
     useEffect(() => {
@@ -20,7 +21,7 @@ const AddProductForm = () => {
             })
     }, [])
 
-    const postProduct = (product, setSubmitting, resetForm) => {
+    const postProduct = (product, setSubmitting) => {
         axios
             .post("http://localhost:5000/products", product, {
                 headers: {
@@ -29,7 +30,7 @@ const AddProductForm = () => {
             })
             .then(response => {
                 console.log("Product added successfully:", response.data);
-                resetForm();
+                navigate("/products/"+response.data.product.id);
             })
             .catch(err => {
                 console.error("There was an error with product: ", err);
@@ -37,6 +38,70 @@ const AddProductForm = () => {
             .finally(() => {
                 setSubmitting(false);
             })
+    }
+
+    const formField = (label, value, text, type, fieldName, errors, 
+        touched, handleChange, handleBlur, step, setFieldValue) => {
+        
+        const inputProps = {};
+        if(type === "number") {
+            inputProps.step = step || 1;
+            inputProps.min = 0;
+        }
+
+        if (type === "selection") {
+            return <RBForm.Group>
+                <RBForm.Label>{label}</RBForm.Label>
+                <RBForm.Control
+                    as='select'
+                    name={fieldName}
+                    multiple
+                    onChange={(e) => {
+                        const selectedOptions = Array.from(
+                            e.target.selectedOptions
+                        )
+                        .map(
+                            (option) => option.value
+                        );
+                        setFieldValue(fieldName, selectedOptions)
+                    }}
+                    onBlur={handleBlur}
+                    value={value}
+                >
+                    {categories.length > 0 ? (
+                        categories.map((item) => (
+                            <option key={item.id} value={item.id}>
+                                {item.name}
+                            </option>
+                        ) 
+                    )
+                    ) : (
+                        <option disabled>No {label} available</option>
+                    )
+                } 
+                </RBForm.Control>
+                <RBForm.Text className="text-muted">
+                    {text}
+                    {}
+                </RBForm.Text>
+        </RBForm.Group>
+        } else {
+            return <RBForm.Group className="mb-3">
+                <RBForm.Label>{label}</RBForm.Label>
+                    <RBForm.Control
+                        type={type}
+                        name={fieldName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={value}
+                        {...inputProps}
+                    />
+                    <RBForm.Text>{text}</RBForm.Text>
+                    {errors.fieldName && touched.fieldName && errors.fieldName}
+            </RBForm.Group>
+        }
+
+        
     }
     
     const productObjectMapper = (product) => {
@@ -52,9 +117,9 @@ const AddProductForm = () => {
     }
     
     return <Container className="justify-content-center align-items-center vh-100">
-        <Row>
-            <Col>
-                <Card>
+        <Row className="w-100">
+            <Col md={{span: 8, offset: 2}}>
+                <Card className="p-4" style={{backgroundColor: '#f5f5f5'}}>
                     <Formik
                         initialValues={{
                             name:'',
@@ -62,7 +127,6 @@ const AddProductForm = () => {
                             price: '',
                             cost: '',
                             current_stock: '',
-                            discontinued: false,
                             category_ids: []
                         }}
                         validationSchema = {
@@ -77,7 +141,7 @@ const AddProductForm = () => {
                         }
                         onSubmit = {(values, {setSubmitting, resetForm}) => {
                             const product = productObjectMapper(values)
-                            postProduct(product, setSubmitting, resetForm);
+                            postProduct(product, setSubmitting);
                         }}
                     >
                 {({
@@ -91,122 +155,94 @@ const AddProductForm = () => {
                     setFieldValue
                 }) => (
                     <RBForm onSubmit={handleSubmit}>
-                        <RBForm.Group className="mb-3">
-                            <RBForm.Label>Name</RBForm.Label>
-                            <RBForm.Control
-                                type="text"
-                                name="name"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.name}
-                            />
-                            {errors.name && touched.name && errors.name}
-                        </RBForm.Group>
+                        {
+                            formField(
+                                "Name", 
+                                values.name, 
+                                "Product's name", 
+                                "text", 
+                                "name", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur
+                            )
+                        }
 
-
-
-                        <RBForm.Group>
-                            <RBForm.Label>Description</RBForm.Label>
-                            <RBForm.Control
-                                type="text"
-                                name="description"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.description}
-                            />
-                            {errors.description && touched.description && errors.description}
-                        </RBForm.Group>
-
-
+                        {
+                            formField(
+                                "Description", 
+                                values.description, 
+                                "Product's description", 
+                                "text", 
+                                "description", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur
+                            )
+                        }
                         
-                        <RBForm.Group>
-                            <RBForm.Label>Categories</RBForm.Label>
-                            <RBForm.Control
-                                as='select'
-                                name="category_ids"
-                                multiple
-                                onChange={(e) => {
-                                    const selectedOptions = Array.from(
-                                        e.target.selectedOptions
-                                    )
-                                    .map(
-                                        (option) => option.value
-                                    );
-                                    setFieldValue('category_ids', selectedOptions)
-                                }}
-                                onBlur={handleBlur}
-                                value={values.category_ids}
-                            >
-                                {categories.length > 0 ? (
-                                    categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ) 
-                                )
-                                ) : (
-                                    <option disabled>No categories available</option>
-                                )
-                            } 
-                            </RBForm.Control>
-                            <RBForm.Text className="text-muted">
-                                Hold Ctrl and click on all desired categories
-                            </RBForm.Text>
-                        </RBForm.Group>
+                        {
+                            formField(
+                                "Categories", 
+                                values.category_ids, 
+                                "Hold Ctrl and click on all desired categories", 
+                                "selection", 
+                                "category_ids", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur, 
+                                null, 
+                                setFieldValue
+                            )
+                        }    
+
+                        {
+                            formField(
+                                "Price",
+                                values.price, 
+                                "How much is the product going to be sold for?", 
+                                "number", 
+                                "price", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur, 
+                                "0.01"
+                            )
+                        }
+                    
+                        {
+                            formField(
+                                "Cost", 
+                                values.cost, 
+                                "How much does the product cost us?", 
+                                "number", 
+                                "cost", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur, 
+                                "0.01"
+                            )
+                        }
                         
+                        {
+                            formField(
+                                "Stock", 
+                                values.current_stock, 
+                                "How many do we have?", 
+                                "number", 
+                                "current_stock", 
+                                errors, 
+                                touched, 
+                                handleChange, 
+                                handleBlur
+                            )
+                        }
 
-
-                        <RBForm.Group>
-                            <RBForm.Label>Price</RBForm.Label>
-                            <RBForm.Control
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="price"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.price}
-                            />
-                            <RBForm.Text className="text-muted">
-                                How much is going to be the product sold for?
-                            </RBForm.Text>
-                            {errors.price && touched.price && errors.price}
-                        </RBForm.Group>
-
-
-
-                        <RBForm.Group>
-                            <RBForm.Label>Cost</RBForm.Label>
-                            <RBForm.Control
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="cost"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.cost}
-                            />
-                            <RBForm.Text className="text-muted">
-                                How much does the product cost us?
-                            </RBForm.Text>
-                            {errors.cost && touched.cost && errors.cost}
-                        </RBForm.Group>
-                        
-                        <RBForm.Group>
-                            <RBForm.Label>Stock</RBForm.Label>
-                            <RBForm.Control
-                                type="number"
-                                step="1"
-                                min="0"
-                                name="current_stock"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.current_stock}
-                            />
-                            {errors.current_stock && touched.current_stock && errors.current_stock}
-                        </RBForm.Group>
-                        
-                        
                         <Button type="submit" disabled={isSubmitting}>
                             Submit
                         </Button>
