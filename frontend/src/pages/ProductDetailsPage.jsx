@@ -26,6 +26,10 @@ const ProductDetailsPage = () => {
             })
     }
 
+    const handleEditButtonClick = () => {
+        navigate(`/products/${id}/edit`)
+    }
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -73,6 +77,9 @@ const ProductDetailsPage = () => {
                                 </Button>
                                 <Button onClick={handleBackToAllProductsPageClick}>
                                     Keep Browsing
+                                </Button>
+                                <Button variant="warning" onClick={handleEditButtonClick}>
+                                    Edit Product
                                 </Button>
                                 <Button variant="danger" onClick={handleDeleteButtonClick}>
                                     Delete Product
