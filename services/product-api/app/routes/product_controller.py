@@ -45,13 +45,23 @@ class ProductList(Resource):
         db.session.commit()
         
         return {'product': product.serialize_product}, 201
-
+        
 class ProductDetail(Resource):
     def get(self, product_id):
         product = Product.query.get(product_id)
         if not product:
             return {'message': 'Product not found'}, 404
         return {'product': product.serialize_product}
+    
+    def delete(self, product_id):
+        product = Product.query.get(product_id)
+        if not product:
+            return {'message': 'Product not found'}, 404
+        
+        db.session.delete(product)
+        db.session.commit()
+        
+        return {'message': 'Product successfully deleted'}, 204
     
     def put(self, product_id):
         parser = reqparse.RequestParser()
