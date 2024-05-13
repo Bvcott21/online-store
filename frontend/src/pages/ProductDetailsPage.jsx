@@ -15,6 +15,17 @@ const ProductDetailsPage = () => {
         navigate('/products')
     }
 
+    const handleDeleteButtonClick = () => {
+        axios
+            .delete('http://localhost:5000/products/'+id)
+            .then(response => {
+                navigate('/products')
+            })
+            .catch(error => {
+                console.log('Error deleting product: ' + error)
+            })
+    }
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -62,6 +73,9 @@ const ProductDetailsPage = () => {
                                 </Button>
                                 <Button onClick={handleBackToAllProductsPageClick}>
                                     Keep Browsing
+                                </Button>
+                                <Button variant="danger" onClick={handleDeleteButtonClick}>
+                                    Delete Product
                                 </Button>
                             </ButtonGroup>
                         </Card.Body>
